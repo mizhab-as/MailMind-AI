@@ -68,3 +68,48 @@ def seed_demo_data(db: Session):
         {"name": "Internship Gmail", "provider": "Gmail", "email_address": "demo.intern@gmail.com", "is_primary": False}
     ]
 
+    accounts_map = {}
+    for p in providers:
+        acc = db.query(Account).filter(Account.email_address == p["email_address"]).first()
+        if not acc:
+            acc = Account(
+                user_id=user.id,
+                provider=p["provider"],
+                email_address=p["email_address"],
+                name=p["name"],
+                is_sync_enabled=True,
+                is_primary=p["is_primary"]
+            )
+            db.add(acc)
+            db.commit()
+            db.refresh(acc)
+        accounts_map[p["name"]] = acc
+
+    # Seed emails if database is empty of emails
+    if db.query(Email).count() == 0:
+        ai = AIService()
+        for t in TEMPLATES:
+            acc = accounts_map.get(t["provider"])
+            if not acc:
+                continue
+            
+            # Create Email
+            email = Email(
+                account_id=acc.id,
+                sender=t["sender"],
+                recipient=acc.email_address,
+                subject=t["subject"],
+                body=t["body"],
+                received_at=datetime.utcnow() - timedelta(hours=random.randint(1, 24)),
+                is_read=False,
+                importance_score=50
+            )
+            db.add(email)
+            db.commit()
+            db.refresh(email)
+            
+            # Analyze using AI
+            analysis = ai.analyze_email(email.sender, email.subject, email.body)
+            _save_analysis_to_db(db, email.id, analysis)
+
+

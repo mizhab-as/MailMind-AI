@@ -87,3 +87,79 @@ class AIService:
             tags = ["Suspicious"]
             importance = 5
 
+        # Extract summaries and action items
+        quick_summary = f"Email from {sender} regarding '{subject}'."
+        bullet_points = [
+            f"Received a new communication from {sender}.",
+            f"Subject line: {subject}."
+        ]
+        action_items = []
+        if "action" in sb or "reply" in sb or "submit" in sb:
+            action_items.append("Review this email and reply if necessary.")
+            bullet_points.append("Action is requested from the sender.")
+        else:
+            bullet_points.append("No immediate action required.")
+
+        # Extract deadlines
+        deadlines = []
+        date_matches = re.findall(r'(\b\d{1,2}\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*|\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{1,2})', sb)
+        for d in date_matches:
+            due_at = datetime.utcnow() + timedelta(days=5) # Mock due date
+            deadlines.append({
+                "title": f"Deadline mentioned: {d}",
+                "due_at": due_at.isoformat(),
+                "source_type": "Academic" if category == "Academic" else "Assessment" if "test" in sb or "assessment" in sb else "Registration"
+            })
+            action_items.append(f"Complete task before deadline ({d}).")
+
+        # Extract application state
+        application = None
+        if category in ["Opportunities", "Interviews", "Acceptance", "Rejection"] or any(w in sb for w in ["google", "microsoft", "meta", "netflix", "apple", "startup"]):
+            company = "Unknown Company"
+            for c in ["google", "microsoft", "meta", "netflix", "apple", "github", "linkedin"]:
+                if c in sb:
+                    company = c.title()
+                    break
+            role = "Software Engineering Intern" if "intern" in sb else "Software Engineer"
+            status = "Applied"
+            if category == "Interviews":
+                status = "Interview"
+            elif category == "Acceptance":
+                status = "Accepted"
+            elif category == "Rejection":
+                status = "Rejected"
+            elif "assessment" in sb or "test" in sb:
+                status = "Assessment"
+            
+            application = {
+                "company": company,
+                "role": role,
+                "current_status": status,
+                "timeline_events": [
+                    {"status": "Applied", "date": (datetime.utcnow() - timedelta(days=7)).isoformat()},
+                    {"status": status, "date": datetime.utcnow().isoformat()}
+                ]
+            }
+
+        # Spam analysis
+        spam_analysis = {
+            "risk_score": 90 if category == "Spam" else 10 if category == "Promotions" else 2,
+            "trust_score": 10 if category == "Spam" else 90,
+            "explanation": "This email matches security patterns for phishing." if category == "Spam" else "Safe email from verified sender.",
+            "phishing_detected": category == "Spam",
+            "malicious_attachment_detected": "attachment" in sb and category == "Spam"
+        }
+
+        return {
+            "category": category,
+            "tags": tags,
+            "importance_score": importance,
+            "quick_summary": quick_summary,
+            "bullet_points": bullet_points,
+            "action_items": action_items,
+            "deadlines": deadlines,
+            "application": application,
+            "spam_analysis": spam_analysis
+        }
+
+

@@ -1,0 +1,53 @@
+from datetime import datetime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Text
+from sqlalchemy.orm import relationship
+from .db import Base
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    password_hash = Column(String, nullable=False)
+    gemini_api_key = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    accounts = relationship("Account", back_populates="user", cascade="all, delete-orphan")
+
+
+class Account(Base):
+    __tablename__ = "accounts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    provider = Column(String, nullable=False)  # "Gmail", "Outlook", etc.
+    email_address = Column(String, unique=True, index=True, nullable=False)
+    name = Column(String, nullable=False)
+    is_sync_enabled = Column(Boolean, default=True)
+    is_primary = Column(Boolean, default=False)
+
+    user = relationship("User", back_populates="accounts")
+    emails = relationship("Email", back_populates="account", cascade="all, delete-orphan")
+
+
+class Email(Base):
+    __tablename__ = "emails"
+
+    id = Column(Integer, primary_key=True, index=True)
+    account_id = Column(Integer, ForeignKey("accounts.id"), nullable=False)
+    sender = Column(String, nullable=False)
+    recipient = Column(String, nullable=False)
+    subject = Column(String, nullable=False)
+    body = Column(Text, nullable=False)
+    received_at = Column(DateTime, default=datetime.utcnow)
+    is_read = Column(Boolean, default=False)
+    importance_score = Column(Integer, default=50)  # 0 to 100
+
+    account = relationship("Account", back_populates="emails")
+    
+    # Relationships to detail tables (1-to-1 or 1-to-many)
+    classification = relationship("Classification", uselist=False, back_populates="email", cascade="all, delete-orphan")
+    summary = relationship("AISummary", uselist=False, back_populates="email", cascade="all, delete-orphan")
+    spam_analysis = relationship("SpamAnalysis", uselist=False, back_populates="email", cascade="all, delete-orphan")
+    application = relationship("Application", uselist=False, back_populates="email", cascade="all, delete-orphan")
+    deadlines = relationship("Deadline", back_populates="email", cascade="all, delete-orphan")

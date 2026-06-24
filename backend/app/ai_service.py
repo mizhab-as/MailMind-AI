@@ -162,4 +162,46 @@ class AIService:
             "spam_analysis": spam_analysis
         }
 
+    def _analyze_with_gemini(self, sender: str, subject: str, body: str) -> dict:
+        prompt = f"""
+        You are MailMind AI's email parser. Analyze this email:
+        Sender: {sender}
+        Subject: {subject}
+        Body: {body}
+
+        Return a JSON object containing:
+        - "category": primary category, must be one of ["Opportunities", "Interviews", "Acceptance", "Rejection", "Academic", "Certifications", "Competitions", "Social", "Promotions", "Newsletters", "Finance", "Spam"].
+        - "tags": list of 1-3 strings.
+        - "importance_score": integer from 0 to 100.
+        - "quick_summary": one sentence summarizing the email.
+        - "bullet_points": list of 3-5 summaries.
+        - "action_items": list of tasks for the user.
+        - "deadlines": list of objects with "title", "due_at" (ISO format), "source_type" (one of "Assignment", "Assessment", "Interview", "Registration").
+        - "application": null or object with "company", "role", "current_status" (one of "Applied", "Assessment", "Interview", "Accepted", "Rejected"), "timeline_events" (list of objects with "status" and "date" in ISO format).
+        - "spam_analysis": object with "risk_score" (0-100), "trust_score" (0-100), "explanation", "phishing_detected" (boolean), "malicious_attachment_detected" (boolean).
+        """
+        from google.genai import types
+        response = self.client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig(response_mime_type="application/json")
+        )
+        return json.loads(response.text)
+
+    def _answer_with_gemini(self, query: str, emails_context: str, chat_history: list = None) -> str:
+        prompt = f"""
+        You are MailMind AI's conversational assistant. Answer the user's question based on their emails.
+        
+        Emails Context:
+        {emails_context}
+        
+        Question: {query}
+        """
+        response = self.client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
+        )
+        return response.text
+
+
 

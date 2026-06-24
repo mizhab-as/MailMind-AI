@@ -18,7 +18,7 @@ class _InboxScreenState extends State<InboxScreen> {
     {'name': 'All', 'icon': Icons.all_inbox},
     {'name': 'Opportunities', 'icon': Icons.work_outline, 'color': Colors.purple},
     {'name': 'Interviews', 'icon': Icons.video_call_outlined, 'color': Colors.amber},
-    {'name': 'Acceptance', 'icon': Icons.check_circle_outline, 'color': Colors.emerald},
+    {'name': 'Acceptance', 'icon': Icons.check_circle_outline, 'color': const Color(0xFF2CB67D)},
     {'name': 'Rejection', 'icon': Icons.cancel_outlined, 'color': Colors.red},
     {'name': 'Academic', 'icon': Icons.school_outlined, 'color': Colors.blue},
     {'name': 'Finance', 'icon': Icons.account_balance_wallet_outlined, 'color': Colors.green},

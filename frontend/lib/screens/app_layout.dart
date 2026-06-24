@@ -107,7 +107,7 @@ class _AppLayoutState extends State<AppLayout> {
                       _isSidebarCollapsed ? Icons.chevron_right : Icons.chevron_left,
                       color: MailMindTheme.textMuted,
                     ),
-                    onTap: () => setState(() => _isSidebarCollapsed = !_isSidebarCollapsed),
+                    onPressed: () => setState(() => _isSidebarCollapsed = !_isSidebarCollapsed),
                   ),
                   const SizedBox(height: 16),
                 ],
@@ -131,7 +131,7 @@ class _AppLayoutState extends State<AppLayout> {
                       if (isMobile) ...[
                         IconButton(
                           icon: const Icon(Icons.menu),
-                          onTap: () {
+                          onPressed: () {
                             // Simple bottom drawer selector for navigation
                             _showNavigationSheet(context);
                           },

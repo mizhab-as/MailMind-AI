@@ -106,7 +106,7 @@ class DashboardScreen extends StatelessWidget {
                       children: [
                         Text('Opportunities Status', style: Theme.of(context).textTheme.titleMedium),
                         const SizedBox(height: 16),
-                        _buildListItem('Google (Internship)', 'Interview Scheduled', Icons.check_circle_outline, Colors.emerald),
+                        _buildListItem('Google (Internship)', 'Interview Scheduled', Icons.check_circle_outline, const Color(0xFF2CB67D)),
                         _buildListItem('Microsoft (SE Role)', 'Assessment Pending', Icons.hourglass_empty, Colors.amber),
                         _buildListItem('StartupXYZ (Internship)', 'Rejection Email Received', Icons.cancel_outlined, Colors.red),
                       ],

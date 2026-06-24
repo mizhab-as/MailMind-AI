@@ -48,7 +48,7 @@ class SecurityScreen extends StatelessWidget {
                         value: (stats['security_score'] as int? ?? 92) / 100,
                         strokeWidth: 10,
                         backgroundColor: Colors.white.withOpacity(0.05),
-                        color: Colors.emerald,
+                        color: const Color(0xFF2CB67D),
                       ),
                     ),
                     Text(
@@ -62,7 +62,7 @@ class SecurityScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('System Security Shield: Active', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.emerald)),
+                      Text('System Security Shield: Active', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: const Color(0xFF2CB67D))),
                       SizedBox(height: 4),
                       Text(
                         'AI engine scans incoming messages in real-time. Blocked phishing attempts have been sandboxed and isolated automatically. No action is required.',
@@ -124,10 +124,10 @@ class SecurityScreen extends StatelessWidget {
                       children: [
                         Text('Attachment Safety Scanner', style: Theme.of(context).textTheme.titleMedium),
                         const SizedBox(height: 20),
-                        _buildAttachmentRow('cv_v2_final.pdf', 'Safe (Verified)', Icons.verified_user, Colors.emerald),
-                        _buildAttachmentRow('invoice_29910.xlsx', 'Safe (Verified)', Icons.verified_user, Colors.emerald),
+                        _buildAttachmentRow('cv_v2_final.pdf', 'Safe (Verified)', Icons.verified_user, const Color(0xFF2CB67D)),
+                        _buildAttachmentRow('invoice_29910.xlsx', 'Safe (Verified)', Icons.verified_user, const Color(0xFF2CB67D)),
                         _buildAttachmentRow('win_giftcard_1000.exe', 'Dangerous (Blocked)', Icons.gpp_bad, Colors.red),
-                        _buildAttachmentRow('lecture_slides_ml.zip', 'Safe (Verified)', Icons.verified_user, Colors.emerald),
+                        _buildAttachmentRow('lecture_slides_ml.zip', 'Safe (Verified)', Icons.verified_user, const Color(0xFF2CB67D)),
                       ],
                     ),
                   ),

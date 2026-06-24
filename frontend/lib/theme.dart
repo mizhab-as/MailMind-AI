@@ -50,7 +50,7 @@ class MailMindTheme {
           bodyMedium: const TextStyle(color: textMuted),
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: const Color(0xFF16161A),
         elevation: 0,
         shape: RoundedRectangleBorder(

@@ -117,14 +117,14 @@ class _TrackerScreenState extends State<TrackerScreen> {
           children: [
             Icon(
               isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
-              color: isCompleted ? Colors.emerald : MailMindTheme.textMuted,
+              color: isCompleted ? const Color(0xFF2CB67D) : MailMindTheme.textMuted,
               size: 20,
             ),
             if (showConnector)
               Container(
                 width: 2,
                 height: 45,
-                color: isCompleted ? Colors.emerald : MailMindTheme.textMuted.withOpacity(0.3),
+                color: isCompleted ? const Color(0xFF2CB67D) : MailMindTheme.textMuted.withOpacity(0.3),
               ),
           ],
         ),

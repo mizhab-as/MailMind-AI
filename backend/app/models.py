@@ -86,3 +86,45 @@ class SpamAnalysis(Base):
 
     email = relationship("Email", back_populates="spam_analysis")
 
+
+class Application(Base):
+    __tablename__ = "applications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email_id = Column(Integer, ForeignKey("emails.id"), nullable=False)
+    company = Column(String, nullable=False)
+    role = Column(String, nullable=False)
+    current_status = Column(String, default="Applied")  # "Applied", "Assessment", "Interview", "Selected", "Rejected"
+    timeline_events = Column(Text, nullable=False)       # JSON-serialized list of status + date events
+
+    email = relationship("Email", back_populates="application")
+
+
+class Deadline(Base):
+    __tablename__ = "deadlines"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email_id = Column(Integer, ForeignKey("emails.id"), nullable=False)
+    title = Column(String, nullable=False)
+    due_at = Column(DateTime, nullable=False)
+    source_type = Column(String, nullable=False)         # "Assignment", "Assessment", "Interview", "Registration"
+
+    email = relationship("Email", back_populates="deadlines")
+    calendar_event = relationship("CalendarEvent", uselist=False, back_populates="deadline", cascade="all, delete-orphan")
+
+
+class CalendarEvent(Base):
+    __tablename__ = "calendar_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+    deadline_id = Column(Integer, ForeignKey("deadlines.id"), nullable=True)
+    email_id = Column(Integer, ForeignKey("emails.id"), nullable=True)
+    title = Column(String, nullable=False)
+    start_time = Column(DateTime, nullable=False)
+    end_time = Column(DateTime, nullable=False)
+    synced_google = Column(Boolean, default=False)
+    synced_outlook = Column(Boolean, default=False)
+
+    deadline = relationship("Deadline", back_populates="calendar_event")
+
+

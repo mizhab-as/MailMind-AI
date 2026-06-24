@@ -51,3 +51,38 @@ class Email(Base):
     spam_analysis = relationship("SpamAnalysis", uselist=False, back_populates="email", cascade="all, delete-orphan")
     application = relationship("Application", uselist=False, back_populates="email", cascade="all, delete-orphan")
     deadlines = relationship("Deadline", back_populates="email", cascade="all, delete-orphan")
+
+
+class Classification(Base):
+    __tablename__ = "classifications"
+
+    email_id = Column(Integer, ForeignKey("emails.id"), primary_key=True)
+    category = Column(String, nullable=False)  # "Opportunities", "Interviews", "Social", etc.
+    secondary_tags = Column(Text, nullable=False)  # JSON-serialized list of tags
+
+    email = relationship("Email", back_populates="classification")
+
+
+class AISummary(Base):
+    __tablename__ = "ai_summaries"
+
+    email_id = Column(Integer, ForeignKey("emails.id"), primary_key=True)
+    quick_summary = Column(Text, nullable=False)
+    bullet_points = Column(Text, nullable=False)  # JSON-serialized list of points
+    action_items = Column(Text, nullable=False)   # JSON-serialized list of action items
+
+    email = relationship("Email", back_populates="summary")
+
+
+class SpamAnalysis(Base):
+    __tablename__ = "spam_analysis"
+
+    email_id = Column(Integer, ForeignKey("emails.id"), primary_key=True)
+    risk_score = Column(Integer, default=0)       # 0 to 100
+    trust_score = Column(Integer, default=100)    # 0 to 100
+    explanation = Column(Text, nullable=False)
+    phishing_detected = Column(Boolean, default=False)
+    malicious_attachment_detected = Column(Boolean, default=False)
+
+    email = relationship("Email", back_populates="spam_analysis")
+

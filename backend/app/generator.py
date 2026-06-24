@@ -149,7 +149,82 @@ def _save_analysis_to_db(db: Session, email_id: int, analysis: dict):
     if email:
         email.importance_score = analysis["importance_score"]
         
+    # 4. Application Tracking
+    if analysis["application"]:
+        app_data = analysis["application"]
+        app = Application(
+            email_id=email_id,
+            company=app_data["company"],
+            role=app_data["role"],
+            current_status=app_data["current_status"],
+            timeline_events=json.dumps(app_data["timeline_events"])
+        )
+        db.add(app)
+        
+    # 5. Deadlines & Calendar Events
+    for d in analysis["deadlines"]:
+        dl = Deadline(
+            email_id=email_id,
+            title=d["title"],
+            due_at=datetime.fromisoformat(d["due_at"]),
+            source_type=d["source_type"]
+        )
+        db.add(dl)
+        db.commit()
+        db.refresh(dl)
+        
+        # Link Calendar Event
+        ev = CalendarEvent(
+            deadline_id=dl.id,
+            email_id=email_id,
+            title=dl.title,
+            start_time=dl.due_at - timedelta(hours=1),
+            end_time=dl.due_at,
+            synced_google=True,
+            synced_outlook=False
+        )
+        db.add(ev)
+        
     db.commit()
+
+
+def generate_random_email(db: Session):
+    """
+    Simulates sync by fetching a random template, adding variation, and adding it to the inbox.
+    """
+    user = db.query(User).filter(User.username == "demo").first()
+    if not user:
+        return
+    accounts = db.query(Account).filter(Account.user_id == user.id).all()
+    if not accounts:
+        return
+        
+    template = random.choice(TEMPLATES)
+    acc = next((a for a in accounts if a.name == template["provider"]), accounts[0])
+    
+    # Add minor text variation to simulate a new mail
+    variation = f" [Received Ref: #{random.randint(1000, 9999)}]"
+    subject = template["subject"] + variation
+    
+    email = Email(
+        account_id=acc.id,
+        sender=template["sender"],
+        recipient=acc.email_address,
+        subject=subject,
+        body=template["body"] + f"\n\nSystem Timestamp: {datetime.utcnow().isoformat()}",
+        received_at=datetime.utcnow(),
+        is_read=False,
+        importance_score=50
+    )
+    db.add(email)
+    db.commit()
+    db.refresh(email)
+    
+    ai = AIService()
+    analysis = ai.analyze_email(email.sender, email.subject, email.body)
+    _save_analysis_to_db(db, email.id, analysis)
+    return email
+
 
 
 

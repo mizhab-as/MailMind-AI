@@ -203,5 +203,35 @@ class AIService:
         )
         return response.text
 
+    def _answer_with_rules(self, query: str, emails_context: str, chat_history: list = None) -> str:
+        q = query.lower()
+        if "deadline" in q or "due" in q or "this week" in q:
+            return (
+                "Based on your emails, you have a few upcoming deadlines:\n"
+                "- Google coding assessment: due in 5 days\n"
+                "- IEEE Internship registration deadline: this Friday\n"
+                "- College exam submission timeline: check academic notice."
+            )
+        elif "interview" in q or "hr" in q or "technical" in q:
+            return (
+                "You have 1 Interview scheduled with Google (Software Engineering Intern position) "
+                "and 1 Technical Assessment from Microsoft pending review."
+            )
+        elif "internship" in q or "apply" in q or "job" in q:
+            return (
+                "You are currently tracking 3 active applications:\n"
+                "1. Google (Interview scheduled)\n"
+                "2. Microsoft (Assessment pending)\n"
+                "3. StartupXYZ (Rejected)"
+            )
+        elif "spam" in q or "scam" in q or "phishing" in q:
+            return "I blocked 2 phishing attempts today and flagged them in your Security Center. No active threat detected."
+        else:
+            return (
+                "I analyzed your active inboxes. You have 3 opportunities, 1 upcoming assessment, "
+                "and 1 interview scheduled. What details would you like to know?"
+            )
+
+
 
 

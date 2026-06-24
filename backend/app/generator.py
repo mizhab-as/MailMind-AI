@@ -113,3 +113,43 @@ def seed_demo_data(db: Session):
             _save_analysis_to_db(db, email.id, analysis)
 
 
+def _save_analysis_to_db(db: Session, email_id: int, analysis: dict):
+    import json
+    
+    # 1. Classification
+    cl = Classification(
+        email_id=email_id,
+        category=analysis["category"],
+        secondary_tags=json.dumps(analysis["tags"])
+    )
+    db.add(cl)
+    
+    # 2. AISummary
+    sm = AISummary(
+        email_id=email_id,
+        quick_summary=analysis["quick_summary"],
+        bullet_points=json.dumps(analysis["bullet_points"]),
+        action_items=json.dumps(analysis["action_items"])
+    )
+    db.add(sm)
+    
+    # 3. SpamAnalysis
+    sp = SpamAnalysis(
+        email_id=email_id,
+        risk_score=analysis["spam_analysis"]["risk_score"],
+        trust_score=analysis["spam_analysis"]["trust_score"],
+        explanation=analysis["spam_analysis"]["explanation"],
+        phishing_detected=analysis["spam_analysis"]["phishing_detected"],
+        malicious_attachment_detected=analysis["spam_analysis"]["malicious_attachment_detected"]
+    )
+    db.add(sp)
+    
+    # Update email importance score
+    email = db.query(Email).filter(Email.id == email_id).first()
+    if email:
+        email.importance_score = analysis["importance_score"]
+        
+    db.commit()
+
+
+

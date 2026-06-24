@@ -24,6 +24,10 @@ TEMPLATES = [
         "subject": "CS-401 Machine Learning: Midterm Assignment Deadline Extended",
         "body": "Dear class, The submission deadline for Assignment 3 has been extended to July 4, 2026 at 11:59 PM. Please submit your Jupyter notebook files via the course platform. Late submissions will face penalties."
     },
+    {
+        "provider": "College Gmail",
+        "sender": "registrar@university.edu",
+        "subject": "Urgent: College Exam Schedule and Registration Notice",
         "body": "Dear students, Registration for the upcoming Semester Finals will close on June 28, 2026. Please verify your course enrollments and complete the payment portal to secure your seat. Late registration is not permitted."
     },
     {
@@ -47,13 +51,13 @@ TEMPLATES = [
 ]
 
 def seed_demo_data(db: Session):
-    # Check if demo user exists
     user = db.query(User).filter(User.username == "demo").first()
     if not user:
-        from passlib.hash import bcrypt
+        import hashlib
+        pwd_hash = hashlib.sha256("demo123".encode()).hexdigest()
         user = User(
             username="demo",
-            password_hash=bcrypt.hash("demo123"),
+            password_hash=pwd_hash,
             gemini_api_key=None
         )
         db.add(user)

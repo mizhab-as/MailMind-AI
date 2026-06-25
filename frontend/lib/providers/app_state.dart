@@ -182,6 +182,15 @@ class AppState extends ChangeNotifier {
     }
   }
 
+  // Theme Management
+  String _selectedThemeName = 'Cyberpunk Neon';
+  String get selectedThemeName => _selectedThemeName;
+
+  void setTheme(String themeName) {
+    _selectedThemeName = themeName;
+    notifyListeners();
+  }
+
   void logout() {
     _isAuthenticated = false;
     _username = '';

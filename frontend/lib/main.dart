@@ -20,10 +20,17 @@ class MailMindApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final state = Provider.of<AppState>(context);
+    final activeTheme = MailMindTheme.themes.firstWhere(
+      (t) => t.name == state.selectedThemeName,
+      orElse: () => MailMindTheme.cyberpunkTheme,
+    );
+    MailMindTheme.currentTheme = activeTheme;
+
     return MaterialApp(
       title: 'MailMind AI',
       debugShowCheckedModeBanner: false,
-      theme: MailMindTheme.darkTheme,
+      theme: activeTheme.themeData,
       home: const AuthWrapper(),
     );
   }
@@ -92,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.psychology, size: 64, color: MailMindTheme.accent),
+                    Icon(Icons.psychology, size: 64, color: MailMindTheme.accent),
                     const SizedBox(height: 24),
                     Text(
                       'MailMind AI',
@@ -135,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'Log in to explore your email intelligence workspace.',
                         style: TextStyle(fontSize: 12, color: MailMindTheme.textMuted),
                         textAlign: TextAlign.center,
@@ -159,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 24),
                       if (_isLoading)
-                        const Center(child: CircularProgressIndicator(color: MailMindTheme.accent))
+                        Center(child: CircularProgressIndicator(color: MailMindTheme.accent))
                       else
                         FilledButton(
                           style: FilledButton.styleFrom(
@@ -170,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: const Text('Log In', style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       const SizedBox(height: 16),
-                      const Text(
+                      Text(
                         'Demo Mode: credentials are prefilled.',
                         style: TextStyle(color: MailMindTheme.textMuted, fontSize: 10),
                         textAlign: TextAlign.center,
@@ -197,7 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(fontSize: 14, color: MailMindTheme.textMuted, height: 1.4),
+              style: TextStyle(fontSize: 14, color: MailMindTheme.textMuted, height: 1.4),
             ),
           )
         ],

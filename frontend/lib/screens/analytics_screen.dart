@@ -12,7 +12,7 @@ class AnalyticsScreen extends StatelessWidget {
     final stats = state.analytics;
 
     if (stats.isEmpty) {
-      return const Center(child: CircularProgressIndicator(color: MailMindTheme.accent));
+      return Center(child: CircularProgressIndicator(color: MailMindTheme.accent));
     }
 
     final catStats = stats['categories_breakdown'] as Map<String, dynamic>? ?? {};
@@ -31,7 +31,7 @@ class AnalyticsScreen extends StatelessWidget {
         children: [
           Text('Email Intelligence Analytics', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 4),
-          const Text('Visual metrics summarizing opportunities, categories, and inbox loads.', style: TextStyle(color: MailMindTheme.textMuted)),
+          Text('Visual metrics summarizing opportunities, categories, and inbox loads.', style: TextStyle(color: MailMindTheme.textMuted)),
           const SizedBox(height: 24),
 
           // Core Metrics
@@ -96,7 +96,7 @@ class AnalyticsScreen extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                                    Text('$count emails', style: const TextStyle(fontSize: 11, color: MailMindTheme.textMuted)),
+                                    Text('$count emails', style: TextStyle(fontSize: 11, color: MailMindTheme.textMuted)),
                                   ],
                                 ),
                                 const SizedBox(height: 6),
@@ -117,7 +117,7 @@ class AnalyticsScreen extends StatelessWidget {
                                           height: 8,
                                           width: constraints.maxWidth * percentage,
                                           decoration: BoxDecoration(
-                                            gradient: const LinearGradient(
+                                            gradient: LinearGradient(
                                               colors: [MailMindTheme.accent, Color(0xFF2CB67D)],
                                             ),
                                             borderRadius: BorderRadius.circular(4),
@@ -178,7 +178,7 @@ class AnalyticsScreen extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(fontSize: 11, color: MailMindTheme.textMuted)),
+              Text(label, style: TextStyle(fontSize: 11, color: MailMindTheme.textMuted)),
               Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
             ],
           )

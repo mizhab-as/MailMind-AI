@@ -62,7 +62,7 @@ class _AppLayoutState extends State<AppLayout> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.psychology, color: MailMindTheme.accent, size: 32),
+                      Icon(Icons.psychology, color: MailMindTheme.accent, size: 32),
                       if (!_isSidebarCollapsed) ...[
                         const SizedBox(width: 12),
                         Text(
@@ -139,7 +139,7 @@ class _AppLayoutState extends State<AppLayout> {
                         const SizedBox(width: 8),
                       ],
                       // Workspace Selector Dropdown
-                      const Icon(Icons.workspaces_outline, color: MailMindTheme.textMuted),
+                      Icon(Icons.workspaces_outline, color: MailMindTheme.textMuted),
                       const SizedBox(width: 8),
                       DropdownButton<int?>(
                         value: state.selectedAccountId,

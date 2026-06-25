@@ -114,9 +114,9 @@ class _InboxScreenState extends State<InboxScreen> {
                 ),
                 Expanded(
                   child: state.isLoadingEmails
-                      ? const Center(child: CircularProgressIndicator(color: MailMindTheme.accent))
+                      ? Center(child: CircularProgressIndicator(color: MailMindTheme.accent))
                       : filteredEmails.isEmpty
-                          ? const Center(child: Text('No emails found', style: TextStyle(color: MailMindTheme.textMuted)))
+                          ? Center(child: Text('No emails found', style: TextStyle(color: MailMindTheme.textMuted)))
                           : ListView.builder(
                               itemCount: filteredEmails.length,
                               itemBuilder: (context, idx) {
@@ -150,7 +150,7 @@ class _InboxScreenState extends State<InboxScreen> {
                                             ),
                                             Text(
                                               DateFormat('hh:mm a').format(receivedAt),
-                                              style: const TextStyle(color: MailMindTheme.textMuted, fontSize: 11),
+                                              style: TextStyle(color: MailMindTheme.textMuted, fontSize: 11),
                                             ),
                                           ],
                                         ),
@@ -193,7 +193,7 @@ class _InboxScreenState extends State<InboxScreen> {
                                               ),
                                               child: Text(
                                                 e['category'],
-                                                style: const TextStyle(color: MailMindTheme.textMuted, fontSize: 10),
+                                                style: TextStyle(color: MailMindTheme.textMuted, fontSize: 10),
                                               ),
                                             ),
                                           ],
@@ -215,12 +215,12 @@ class _InboxScreenState extends State<InboxScreen> {
           Expanded(
             flex: 6,
             child: state.selectedEmail == null
-                ? const Center(
+                ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.auto_awesome, color: MailMindTheme.textMuted, size: 40),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         Text('Select an email to view AI insights', style: TextStyle(color: MailMindTheme.textMuted)),
                       ],
                     ),
@@ -259,7 +259,7 @@ class _EmailDetailPane extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       backgroundColor: MailMindTheme.cardBg,
-                      child: const Icon(Icons.person, color: MailMindTheme.textMuted),
+                      child: Icon(Icons.person, color: MailMindTheme.textMuted),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -267,7 +267,7 @@ class _EmailDetailPane extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(email['sender'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                          Text('To: ${email['recipient']}', style: const TextStyle(color: MailMindTheme.textMuted, fontSize: 11)),
+                          Text('To: ${email['recipient']}', style: TextStyle(color: MailMindTheme.textMuted, fontSize: 11)),
                         ],
                       ),
                     ),
@@ -304,7 +304,7 @@ class _EmailDetailPane extends StatelessWidget {
                               fontSize: 12,
                             ),
                           ),
-                          Text(spam['explanation'], style: const TextStyle(fontSize: 11, color: MailMindTheme.textMuted)),
+                          Text(spam['explanation'], style: TextStyle(fontSize: 11, color: MailMindTheme.textMuted)),
                         ],
                       ),
                     ),
@@ -314,8 +314,8 @@ class _EmailDetailPane extends StatelessWidget {
             ),
 
           // AI Tab bar
-          const TabBar(
-            tabs: [
+          TabBar(
+            tabs: const [
               Tab(text: 'AI Summary'),
               Tab(text: 'Key Points'),
               Tab(text: 'Action Items'),
@@ -346,7 +346,7 @@ class _EmailDetailPane extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.circle, color: MailMindTheme.accent, size: 6),
+                        Icon(Icons.circle, color: MailMindTheme.accent, size: 6),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(

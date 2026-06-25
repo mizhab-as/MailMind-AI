@@ -24,12 +24,12 @@ class _TrackerScreenState extends State<TrackerScreen> {
         .toList();
 
     if (apps.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.timeline, color: MailMindTheme.textMuted, size: 48),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text('No active applications tracked in this workspace.', style: TextStyle(color: MailMindTheme.textMuted)),
           ],
         ),
@@ -74,7 +74,7 @@ class _TrackerScreenState extends State<TrackerScreen> {
                   child: ListTile(
                     title: Text(a['sender'].split('@').first.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text(a['subject'], maxLines: 1, overflow: TextOverflow.ellipsis),
-                    trailing: Text(DateFormat('MMM dd').format(date), style: const TextStyle(fontSize: 11, color: MailMindTheme.textMuted)),
+                    trailing: Text(DateFormat('MMM dd').format(date), style: TextStyle(fontSize: 11, color: MailMindTheme.textMuted)),
                     onTap: () => setState(() => _selectedAppIdx = idx),
                   ),
                 );
@@ -93,7 +93,7 @@ class _TrackerScreenState extends State<TrackerScreen> {
               children: [
                 Text('$company: $role', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20)),
                 const SizedBox(height: 8),
-                Text('Current Status: $status', style: const TextStyle(color: MailMindTheme.accent, fontWeight: FontWeight.bold)),
+                Text('Current Status: $status', style: TextStyle(color: MailMindTheme.accent, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 32),
                 
                 // Timeline milestones
@@ -144,7 +144,7 @@ class _TrackerScreenState extends State<TrackerScreen> {
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: const TextStyle(color: MailMindTheme.textMuted, fontSize: 12),
+                style: TextStyle(color: MailMindTheme.textMuted, fontSize: 12),
               ),
             ],
           ),

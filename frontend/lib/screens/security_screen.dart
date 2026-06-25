@@ -29,7 +29,7 @@ class SecurityScreen extends StatelessWidget {
         children: [
           Text('AI Security Center', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 4),
-          const Text('Shield parameters monitoring authentication safety, attachment integrity, and email scans.', style: TextStyle(color: MailMindTheme.textMuted)),
+          Text('Shield parameters monitoring authentication safety, attachment integrity, and email scans.', style: TextStyle(color: MailMindTheme.textMuted)),
           const SizedBox(height: 24),
 
           // Security Score Row
@@ -58,7 +58,7 @@ class SecurityScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(width: 24),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -91,8 +91,8 @@ class SecurityScreen extends StatelessWidget {
                         Text('Blocked Threats Log', style: Theme.of(context).textTheme.titleMedium),
                         const SizedBox(height: 16),
                         spamEmails.isEmpty
-                            ? const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 24),
+                            ? Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 24),
                                 child: Center(child: Text('No security threats blocked today.', style: TextStyle(color: MailMindTheme.textMuted))),
                               )
                             : Column(
@@ -100,7 +100,7 @@ class SecurityScreen extends StatelessWidget {
                                   contentPadding: EdgeInsets.zero,
                                   leading: const Icon(Icons.gpp_bad, color: Colors.red),
                                   title: Text(e['subject'], style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                                  subtitle: Text('From: ${e['sender']}', style: const TextStyle(fontSize: 10, color: MailMindTheme.textMuted)),
+                                  subtitle: Text('From: ${e['sender']}', style: TextStyle(fontSize: 10, color: MailMindTheme.textMuted)),
                                   trailing: Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                     decoration: BoxDecoration(color: Colors.red.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),

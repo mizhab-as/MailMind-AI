@@ -36,7 +36,7 @@ class CalendarScreen extends StatelessWidget {
                 children: [
                   Text('Smart Deadlines Calendar', style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 4),
-                  const Text('AI-extracted timings and deadline reminders synced with local systems.', style: TextStyle(color: MailMindTheme.textMuted)),
+                  Text('AI-extracted timings and deadline reminders synced with local systems.', style: TextStyle(color: MailMindTheme.textMuted)),
                 ],
               ),
               Row(
@@ -60,12 +60,12 @@ class CalendarScreen extends StatelessWidget {
 
           Expanded(
             child: deadlines.isEmpty
-                ? const Center(
+                ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.calendar_today, color: MailMindTheme.textMuted, size: 40),
-                        SizedBox(height: 12),
+                        const SizedBox(height: 12),
                         Text('No upcoming deadlines detected.', style: TextStyle(color: MailMindTheme.textMuted)),
                       ],
                     ),
@@ -108,7 +108,7 @@ class CalendarScreen extends StatelessWidget {
                                 children: [
                                   Text(d['subject'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                                   const SizedBox(height: 4),
-                                  Text('Source: ${d['account_name']}', style: const TextStyle(color: MailMindTheme.textMuted, fontSize: 11)),
+                                  Text('Source: ${d['account_name']}', style: TextStyle(color: MailMindTheme.textMuted, fontSize: 11)),
                                 ],
                               ),
                             ),
@@ -122,7 +122,7 @@ class CalendarScreen extends StatelessWidget {
                                 ),
                                 Text(
                                   DateFormat('hh:mm a').format(dueAt),
-                                  style: const TextStyle(color: MailMindTheme.textMuted, fontSize: 11),
+                                  style: TextStyle(color: MailMindTheme.textMuted, fontSize: 11),
                                 ),
                               ],
                             ),

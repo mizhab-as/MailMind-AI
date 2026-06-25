@@ -80,7 +80,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
                           CircleAvatar(
                             backgroundColor: MailMindTheme.accent.withOpacity(0.2),
                             radius: 16,
-                            child: const Icon(Icons.psychology, color: MailMindTheme.accent, size: 16),
+                            child: Icon(Icons.psychology, color: MailMindTheme.accent, size: 16),
                           ),
                           const SizedBox(width: 12),
                         ],
@@ -123,8 +123,8 @@ class _AssistantScreenState extends State<AssistantScreen> {
 
           // Loading response loader
           if (state.isSendingMessage)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
               child: SizedBox(
                 width: 20,
                 height: 20,
@@ -161,7 +161,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
               ),
               const SizedBox(width: 12),
               IconButton(
-                icon: const Icon(Icons.send, color: MailMindTheme.accent),
+                icon: Icon(Icons.send, color: MailMindTheme.accent),
                 onPressed: () {
                   if (_msgCtrl.text.trim().isNotEmpty) {
                     state.askAssistant(_msgCtrl.text);

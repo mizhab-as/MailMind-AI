@@ -12,7 +12,7 @@ class DashboardScreen extends StatelessWidget {
     final stats = state.analytics;
 
     if (stats.isEmpty) {
-      return const Center(child: CircularProgressIndicator(color: MailMindTheme.accent));
+      return Center(child: CircularProgressIndicator(color: MailMindTheme.accent));
     }
 
     final appStats = stats['applications'] ?? {};
@@ -25,7 +25,7 @@ class DashboardScreen extends StatelessWidget {
         children: [
           Text('Good Afternoon, ${state.username}', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 4),
-          const Text('Here is what MailMind AI summarized for you today.', style: TextStyle(color: MailMindTheme.textMuted)),
+          Text('Here is what MailMind AI summarized for you today.', style: TextStyle(color: MailMindTheme.textMuted)),
           const SizedBox(height: 24),
           
           // Cards grid row
@@ -132,7 +132,7 @@ class DashboardScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title, style: const TextStyle(color: MailMindTheme.textMuted, fontSize: 13, fontWeight: FontWeight.w600)),
+              Text(title, style: TextStyle(color: MailMindTheme.textMuted, fontSize: 13, fontWeight: FontWeight.w600)),
               Icon(icon, color: color, size: 20),
             ],
           ),
@@ -157,7 +157,7 @@ class DashboardScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                Text(subtitle, style: const TextStyle(color: MailMindTheme.textMuted, fontSize: 11)),
+                Text(subtitle, style: TextStyle(color: MailMindTheme.textMuted, fontSize: 11)),
               ],
             ),
           )

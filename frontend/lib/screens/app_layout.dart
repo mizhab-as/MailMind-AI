@@ -159,6 +159,55 @@ class _AppLayoutState extends State<AppLayout> {
                         onChanged: (val) => state.selectAccount(val),
                       ),
                       const Spacer(),
+                      // Dynamic Theme Selector Dropdown
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: MailMindTheme.textMain.withOpacity(0.04),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: MailMindTheme.textMain.withOpacity(0.08)),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: state.selectedThemeName,
+                            dropdownColor: MailMindTheme.cardBg,
+                            icon: Icon(Icons.palette_outlined, size: 16, color: MailMindTheme.textMuted),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: MailMindTheme.textMain),
+                            onChanged: (String? newValue) {
+                              if (newValue != null) {
+                                state.setTheme(newValue);
+                              }
+                            },
+                            items: MailMindTheme.themes.map<DropdownMenuItem<String>>((AppTheme theme) {
+                              return DropdownMenuItem<String>(
+                                value: theme.name,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      width: 10,
+                                      height: 10,
+                                      decoration: BoxDecoration(
+                                        color: theme.accent,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      theme.name,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: theme.isDark ? Colors.white : Colors.black87,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
                       // Add Mock Email Sync Button
                       FilledButton.icon(
                         icon: const Icon(Icons.sync),

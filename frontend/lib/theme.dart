@@ -33,19 +33,30 @@ class MailMindTheme {
   static Color get textMain => currentTheme.textMain;
   static Color get textMuted => currentTheme.textMuted;
 
-  // Custom glassmorphic decoration
+  // Custom glassmorphic decoration with optional glow and gradient
   static BoxDecoration glassBox({
     Color? color,
     double radius = 16.0,
-    double borderOpacity = 0.08,
+    double borderOpacity = 0.12,
+    bool showGlow = false,
+    Color? glowColor,
   }) {
     return BoxDecoration(
-      color: color ?? currentTheme.cardBg.withOpacity(0.4),
+      color: color ?? currentTheme.cardBg.withOpacity(0.5),
       borderRadius: BorderRadius.circular(radius),
       border: Border.all(
         color: currentTheme.textMain.withOpacity(borderOpacity),
         width: 1.0,
       ),
+      boxShadow: showGlow
+          ? [
+              BoxShadow(
+                color: (glowColor ?? currentTheme.accent).withOpacity(0.15),
+                blurRadius: 16,
+                spreadRadius: 2,
+              )
+            ]
+          : null,
     );
   }
 
@@ -56,7 +67,27 @@ class MailMindTheme {
     return const Color(0xFF2EC4B6); // Emerald Green
   }
 
+  // 0. AMOLED Pitch Dark (Pure Dark)
+  static final AppTheme amoledTheme = AppTheme(
+    name: 'AMOLED Pitch Dark',
+    isDark: true,
+    background: const Color(0xFF000000),
+    cardBg: const Color(0xFF121212),
+    accent: const Color(0xFF00F5D4),
+    textMain: const Color(0xFFFFFFFF),
+    textMuted: const Color(0xFFA0A0A0),
+    themeData: _buildDarkThemeData(
+      background: const Color(0xFF000000),
+      cardBg: const Color(0xFF121212),
+      accent: const Color(0xFF00F5D4),
+      secondary: const Color(0xFF7B2CBF),
+      textMain: const Color(0xFFFFFFFF),
+      textMuted: const Color(0xFFA0A0A0),
+    ),
+  );
+
   // 1. Cyberpunk Neon (Dark)
+
   static final AppTheme cyberpunkTheme = AppTheme(
     name: 'Cyberpunk Neon',
     isDark: true,
@@ -153,11 +184,13 @@ class MailMindTheme {
 
   static final List<AppTheme> themes = [
     cyberpunkTheme,
+    amoledTheme,
     sunsetTheme,
     forestTheme,
     nordTheme,
     lightTheme,
   ];
+
 
   static ThemeData _buildDarkThemeData({
     required Color background,

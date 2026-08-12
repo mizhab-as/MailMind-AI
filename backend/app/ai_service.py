@@ -289,6 +289,41 @@ class AIService:
         else:
             return f"Thank you for your email regarding '{email_subject}'. I have received your message and will follow up shortly."
 
+    def generate_interview_prep(self, company: str, role: str) -> dict:
+        """
+        Generates customized AI interview preparation materials for a given company & role.
+        """
+        if self.client:
+            try:
+                p = f"Generate interview prep guide for role '{role}' at '{company}'. Return JSON with 'company_insights', 'core_topics', 'technical_questions', 'recommended_questions_to_ask'."
+                res = self.client.models.generate_content(model="gemini-2.5-flash", contents=p)
+                txt = res.text.strip()
+                if "{" in txt:
+                    txt = txt[txt.find("{"):txt.rfind("}")+1]
+                    return json.loads(txt)
+            except Exception as e:
+                print(f"Gemini interview prep generation failed: {e}")
+
+        # Local fallback prep guide generator
+        return {
+            "company_insights": f"{company} is a tech industry leader emphasizing scalable distributed systems, high availability, and strong algorithmic foundation.",
+            "core_topics": [
+                "Data Structures: Binary Trees, Graphs, Hash Maps, Heaps",
+                "Algorithms: Dynamic Programming, BFS/DFS, System Design Basics",
+                "Behavioral: STAR method examples for teamwork and leadership"
+            ],
+            "technical_questions": [
+                f"1. How would you design a rate limiter for {company}'s public API endpoints?",
+                "2. Given an array of integers, find the contiguous subarray with the maximum sum.",
+                "3. Explain the difference between process memory isolation and thread synchronization."
+            ],
+            "recommended_questions_to_ask": [
+                "What does the day-to-day workflow look like for an engineer in this team?",
+                "How does the team handle post-mortems and architecture reviews for new features?"
+            ]
+        }
+
+
 
 
 

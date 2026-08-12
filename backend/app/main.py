@@ -411,6 +411,48 @@ def generate_ai_reply(req: AIReplyRequest):
     return {"reply": reply}
 
 
+class InterviewPrepRequest(BaseModel):
+    company: str
+    role: str
+
+@app.post("/ai/interview-prep")
+def generate_interview_prep(req: InterviewPrepRequest):
+    ai = AIService()
+    prep = ai.generate_interview_prep(req.company, req.role)
+    return prep
+
+
+@app.get("/applications/list")
+def list_applications(db: Session = Depends(get_db)):
+    apps = db.query(Application).all()
+    result = []
+    for a in apps:
+        events = json.loads(a.timeline_events) if a.timeline_events else []
+        result.append({
+            "id": a.id,
+            "email_id": a.email_id,
+            "company": a.company,
+            "role": a.role,
+            "current_status": a.current_status,
+            "timeline_events": events,
+        })
+    return result
+
+
+class StatusUpdate(BaseModel):
+    status: str
+
+@app.put("/applications/{app_id}/status")
+def update_app_status(app_id: int, req: StatusUpdate, db: Session = Depends(get_db)):
+    app_obj = db.query(Application).filter(Application.id == app_id).first()
+    if not app_obj:
+        raise HTTPException(status_code=404, detail="Application not found")
+    app_obj.current_status = req.status
+    db.commit()
+    return {"status": "success", "new_status": req.status}
+
+
+
 
 class ConnectionManager:
     def __init__(self):

@@ -113,5 +113,32 @@ class ApiService {
       throw Exception('Failed to sync new mail');
     }
   }
+
+  Future<Map<String, dynamic>> generateAIDraft(String prompt, String recipient, String tone) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/ai/draft'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'prompt': prompt, 'recipient': recipient, 'tone': tone}),
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to generate draft');
+    }
+  }
+
+  Future<String> generateAIReply(String subject, String body, String intent) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/ai/reply'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'subject': subject, 'body': body, 'intent': intent}),
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['reply'];
+    } else {
+      throw Exception('Failed to generate reply');
+    }
+  }
 }
+
 

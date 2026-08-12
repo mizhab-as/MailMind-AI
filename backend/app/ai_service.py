@@ -232,6 +232,64 @@ class AIService:
                 "and 1 interview scheduled. What details would you like to know?"
             )
 
+    def generate_email_draft(self, prompt: str, recipient: str = "", tone: str = "Professional") -> dict:
+        """
+        Generates an email subject and body based on a user prompt and chosen tone.
+        """
+        if self.client:
+            try:
+                p = f"Draft an email to '{recipient}' with tone '{tone}'. Prompt: {prompt}. Return JSON with 'subject' and 'body'."
+                res = self.client.models.generate_content(model="gemini-2.5-flash", contents=p)
+                txt = res.text.strip()
+                if "{" in txt:
+                    txt = txt[txt.find("{"):txt.rfind("}")+1]
+                    return json.loads(txt)
+            except Exception as e:
+                print(f"Gemini API draft generation failed: {e}")
+
+        # Local fallback draft engine
+        if "interview" in prompt.lower() or "confirm" in prompt.lower():
+            subject = f"Confirmation of Interview - {recipient or 'Hiring Team'}"
+            body = (
+                f"Dear {recipient or 'Hiring Manager'},\n\n"
+                f"Thank you for reaching out with this opportunity. I am writing to confirm my attendance "
+                f"and interest in proceeding with the interview process.\n\n"
+                f"Please let me know if there are any prerequisite materials or technical preparation required prior to our meeting.\n\n"
+                f"Best regards,\nDemo User"
+            )
+        elif "follow up" in prompt.lower() or "status" in prompt.lower():
+            subject = f"Follow-up regarding application status"
+            body = (
+                f"Dear {recipient or 'Recruiter'},\n\n"
+                f"I hope this email finds you well. I am following up on my recent application and interview. "
+                f"I remain very enthusiastic about the position and would love to hear any updates regarding next steps.\n\n"
+                f"Thank you for your time and consideration.\n\n"
+                f"Sincerely,\nDemo User"
+            )
+        else:
+            subject = f"Inquiry regarding {prompt[:30]}"
+            body = (
+                f"Dear {recipient or 'Recipient'},\n\n"
+                f"I am writing to get in touch regarding: {prompt}.\n\n"
+                f"I look forward to hearing your thoughts.\n\n"
+                f"Best regards,\nDemo User"
+            )
+        return {"subject": subject, "body": body}
+
+    def generate_auto_reply(self, email_subject: str, email_body: str, intent: str = "Accept") -> str:
+        """
+        Generates a quick smart reply based on an incoming email's subject, body, and user intent.
+        """
+        if intent == "Accept":
+            return f"Thank you for reaching out regarding '{email_subject}'. I am happy to accept and confirm. Looking forward to connecting!"
+        elif intent == "Decline":
+            return f"Thank you for the opportunity regarding '{email_subject}'. Unfortunately, I am unable to proceed at this time due to scheduling constraints."
+        elif intent == "Inquire":
+            return f"Thank you for sending over details about '{email_subject}'. Could you please share more information regarding the timeline and prerequisites?"
+        else:
+            return f"Thank you for your email regarding '{email_subject}'. I have received your message and will follow up shortly."
+
+
 
 
 

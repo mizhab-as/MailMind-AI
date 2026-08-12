@@ -387,6 +387,31 @@ def get_security_alerts(db: Session = Depends(get_db)):
     return db.query(SecurityAlert).order_by(SecurityAlert.created_at.desc()).all()
 
 
+class AIDraftRequest(BaseModel):
+    prompt: str
+    recipient: str = ""
+    tone: str = "Professional"
+
+@app.post("/ai/draft")
+def generate_ai_draft(req: AIDraftRequest):
+    ai = AIService()
+    draft = ai.generate_email_draft(req.prompt, req.recipient, req.tone)
+    return draft
+
+
+class AIReplyRequest(BaseModel):
+    subject: str
+    body: str
+    intent: str = "Accept"
+
+@app.post("/ai/reply")
+def generate_ai_reply(req: AIReplyRequest):
+    ai = AIService()
+    reply = ai.generate_auto_reply(req.subject, req.body, req.intent)
+    return {"reply": reply}
+
+
+
 class ConnectionManager:
     def __init__(self):
         self.active_connections: List[WebSocket] = []

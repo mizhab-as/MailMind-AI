@@ -10,6 +10,8 @@ import 'assistant_screen.dart';
 import 'analytics_screen.dart';
 import 'security_screen.dart';
 import '../widgets/compose_modal.dart';
+import '../widgets/command_palette.dart';
+
 
 
 class AppLayout extends StatefulWidget {
@@ -188,6 +190,43 @@ class _AppLayoutState extends State<AppLayout> {
                         onChanged: (val) => state.selectAccount(val),
                       ),
                       const Spacer(),
+                      // Cmd+K Command Palette Launcher Button
+                      InkWell(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => CommandPaletteModal(
+                              onNavigate: (idx) => setState(() => _activeTabIndex = idx),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.06),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.white.withOpacity(0.1)),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.search, size: 16, color: MailMindTheme.textMuted),
+                              const SizedBox(width: 8),
+                              Text('Search or type command...', style: TextStyle(color: MailMindTheme.textMuted, fontSize: 13)),
+                              const SizedBox(width: 16),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text('Cmd+K', style: TextStyle(fontSize: 10, color: Colors.white70, fontWeight: FontWeight.bold)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+
                       // Dynamic Theme Selector Dropdown
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),

@@ -1,7 +1,7 @@
 import random
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from .models import User, Account, Email, Classification, AISummary, SpamAnalysis, Application, Deadline, CalendarEvent
+from .models import User, Account, Email, Classification, AISummary, SpamAnalysis, Application, Deadline, CalendarEvent, EmailRule, Draft, AuditLog, SecurityAlert
 from .ai_service import AIService
 
 # Sample email templates for seeding the inbox
@@ -115,6 +115,40 @@ def seed_demo_data(db: Session):
             # Analyze using AI
             analysis = ai.analyze_email(email.sender, email.subject, email.body)
             _save_analysis_to_db(db, email.id, analysis)
+
+    # Seed Default Email Rules
+    if db.query(EmailRule).count() == 0:
+        default_rules = [
+            EmailRule(rule_name="Auto-Tag Job Offers", condition_field="subject", condition_operator="contains", condition_value="Interview", action_type="set_category", action_value="Interviews"),
+            EmailRule(rule_name="Flag Urgent Security Alerts", condition_field="subject", condition_operator="contains", condition_value="Security", action_type="flag_urgent", action_value="90"),
+            EmailRule(rule_name="Categorize University Mail", condition_field="sender", condition_operator="contains", condition_value="university.edu", action_type="set_category", action_value="Academic")
+        ]
+        db.add_all(default_rules)
+        db.commit()
+
+    # Seed Sample Drafts
+    if db.query(Draft).count() == 0:
+        draft = Draft(
+            user_id=user.id,
+            recipient="recruiter@google.com",
+            subject="Re: Google Software Engineering Intern Interview Confirmation",
+            body="Hi Google Recruiting Team,\n\nThank you for reaching out! I am thrilled to confirm my availability for the 45-minute technical interview.\n\nBest regards,\nDemo User",
+            tone="Professional"
+        )
+        db.add(draft)
+        db.commit()
+
+    # Seed Security Alerts
+    if db.query(SecurityAlert).count() == 0:
+        alert = SecurityAlert(
+            alert_type="Phishing Attempt",
+            severity="High",
+            description="Suspicious Amazon Gift Card email detected with spoofed domain (claim-amazon-giftcard.net)",
+            status="Active"
+        )
+        db.add(alert)
+        db.commit()
+
 
 
 def _save_analysis_to_db(db: Session, email_id: int, analysis: dict):

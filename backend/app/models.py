@@ -128,3 +128,56 @@ class CalendarEvent(Base):
     deadline = relationship("Deadline", back_populates="calendar_event")
 
 
+class EmailRule(Base):
+    __tablename__ = "email_rules"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, default=1)
+    rule_name = Column(String, nullable=False)
+    condition_field = Column(String, nullable=False)  # "sender", "subject", "body", "importance"
+    condition_operator = Column(String, nullable=False)  # "contains", "equals", "greater_than"
+    condition_value = Column(String, nullable=False)
+    action_type = Column(String, nullable=False)  # "set_category", "set_read", "apply_tag", "flag_urgent"
+    action_value = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class Draft(Base):
+    __tablename__ = "drafts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, default=1)
+    account_id = Column(Integer, nullable=True)
+    recipient = Column(String, default="")
+    subject = Column(String, default="")
+    body = Column(Text, default="")
+    tone = Column(String, default="Professional")
+    updated_at = Column(DateTime, default=datetime.utcnow)
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, nullable=False, default=1)
+    action = Column(String, nullable=False)
+    target_type = Column(String, nullable=False)
+    target_id = Column(Integer, nullable=True)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    details = Column(Text, nullable=True)
+
+
+class SecurityAlert(Base):
+    __tablename__ = "security_alerts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email_id = Column(Integer, ForeignKey("emails.id"), nullable=True)
+    alert_type = Column(String, nullable=False)  # "Phishing", "Spoofing", "Malware"
+    severity = Column(String, default="High")    # "Low", "Medium", "High", "Critical"
+    description = Column(Text, nullable=False)
+    status = Column(String, default="Active")    # "Active", "Dismissed", "Quarantined"
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+

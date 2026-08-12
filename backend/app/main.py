@@ -1,14 +1,16 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 import json
+from datetime import datetime
 from pydantic import BaseModel
 
 from .db import Base, engine, get_db
-from .models import User, Account, Email, Classification, AISummary, SpamAnalysis, Application, Deadline, CalendarEvent
+from .models import User, Account, Email, Classification, AISummary, SpamAnalysis, Application, Deadline, CalendarEvent, EmailRule, Draft, AuditLog, SecurityAlert
 from .generator import seed_demo_data, generate_random_email
 from .ai_service import AIService
+
 
 # Initialize tables
 Base.metadata.create_all(bind=engine)
@@ -244,5 +246,190 @@ def trigger_sync(db: Session = Depends(get_db)):
             "category": email.classification.category if email.classification else "Inbox"
         }
     }
+
+# --------------------------------------------------------------------------
+# PHASE 1 NEW ENDPOINTS: Advanced Search, Rules, Drafts, Security & WS
+# --------------------------------------------------------------------------
+
+@app.get("/emails/search/advanced")
+def search_emails_advanced(
+    q: Optional[str] = None,
+    category: Optional[str] = None,
+    account_id: Optional[int] = None,
+    is_read: Optional[bool] = None,
+    min_importance: Optional[int] = None,
+    db: Session = Depends(get_db)
+):
+    query = db.query(Email)
+    if account_id:
+        query = query.filter(Email.account_id == account_id)
+    if is_read is not None:
+        query = query.filter(Email.is_read == is_read)
+    if min_importance is not None:
+        query = query.filter(Email.importance_score >= min_importance)
+    if category and category != "All":
+        query = query.join(Classification).filter(Classification.category == category)
+    if q:
+        search_pattern = f"%{q}%"
+        query = query.filter(
+            (Email.subject.ilike(search_pattern)) | 
+            (Email.sender.ilike(search_pattern)) | 
+            (Email.body.ilike(search_pattern))
+        )
+    
+    emails = query.order_by(Email.received_at.desc()).all()
+    result = []
+    for e in emails:
+        tags = json.loads(e.classification.secondary_tags) if e.classification else []
+        result.append({
+            "id": e.id,
+            "account_id": e.account_id,
+            "account_name": e.account.name if e.account else "Inbox",
+            "sender": e.sender,
+            "recipient": e.recipient,
+            "subject": e.subject,
+            "body": e.body,
+            "received_at": e.received_at,
+            "is_read": e.is_read,
+            "importance_score": e.importance_score,
+            "category": e.classification.category if e.classification else "Inbox",
+            "tags": tags
+        })
+    return result
+
+
+class DraftCreate(BaseModel):
+    recipient: str = ""
+    subject: str = ""
+    body: str = ""
+    tone: str = "Professional"
+
+@app.get("/drafts")
+def get_drafts(db: Session = Depends(get_db)):
+    return db.query(Draft).order_by(Draft.updated_at.desc()).all()
+
+@app.post("/drafts")
+def create_draft(req: DraftCreate, db: Session = Depends(get_db)):
+    draft = Draft(
+        user_id=1,
+        recipient=req.recipient,
+        subject=req.subject,
+        body=req.body,
+        tone=req.tone,
+        updated_at=datetime.utcnow()
+    )
+    db.add(draft)
+    db.commit()
+    db.refresh(draft)
+    return draft
+
+@app.delete("/drafts/{draft_id}")
+def delete_draft(draft_id: int, db: Session = Depends(get_db)):
+    draft = db.query(Draft).filter(Draft.id == draft_id).first()
+    if not draft:
+        raise HTTPException(status_code=404, detail="Draft not found")
+    db.delete(draft)
+    db.commit()
+    return {"status": "success"}
+
+
+class RuleCreate(BaseModel):
+    rule_name: str
+    condition_field: str
+    condition_operator: str
+    condition_value: str
+    action_type: str
+    action_value: str
+
+@app.get("/rules")
+def get_rules(db: Session = Depends(get_db)):
+    return db.query(EmailRule).all()
+
+@app.post("/rules")
+def create_rule(req: RuleCreate, db: Session = Depends(get_db)):
+    rule = EmailRule(
+        user_id=1,
+        rule_name=req.rule_name,
+        condition_field=req.condition_field,
+        condition_operator=req.condition_operator,
+        condition_value=req.condition_value,
+        action_type=req.action_type,
+        action_value=req.action_value,
+        is_active=True
+    )
+    db.add(rule)
+    db.commit()
+    db.refresh(rule)
+    return rule
+
+@app.delete("/rules/{rule_id}")
+def delete_rule(rule_id: int, db: Session = Depends(get_db)):
+    rule = db.query(EmailRule).filter(EmailRule.id == rule_id).first()
+    if not rule:
+        raise HTTPException(status_code=404, detail="Rule not found")
+    db.delete(rule)
+    db.commit()
+    return {"status": "success"}
+
+@app.post("/rules/execute")
+def execute_rules(db: Session = Depends(get_db)):
+    rules = db.query(EmailRule).filter(EmailRule.is_active == True).all()
+    emails = db.query(Email).all()
+    applied_count = 0
+
+    for email in emails:
+        for rule in rules:
+            field_val = getattr(email, rule.condition_field, "") or ""
+            match = False
+            if rule.condition_operator == "contains" and rule.condition_value.lower() in field_val.lower():
+                match = True
+            elif rule.condition_operator == "equals" and rule.condition_value.lower() == field_val.lower():
+                match = True
+
+            if match:
+                applied_count += 1
+                if rule.action_type == "set_category" and email.classification:
+                    email.classification.category = rule.action_value
+                elif rule.action_type == "flag_urgent":
+                    email.importance_score = min(100, int(rule.action_value))
+                elif rule.action_type == "set_read":
+                    email.is_read = (rule.action_value.lower() == "true")
+    db.commit()
+    return {"status": "success", "applied_actions": applied_count}
+
+
+@app.get("/security/alerts")
+def get_security_alerts(db: Session = Depends(get_db)):
+    return db.query(SecurityAlert).order_by(SecurityAlert.created_at.desc()).all()
+
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        if websocket in self.active_connections:
+            self.active_connections.remove(websocket)
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
+
+ws_manager = ConnectionManager()
+
+@app.websocket("/ws/notifications")
+async def websocket_notifications(websocket: WebSocket):
+    await ws_manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await ws_manager.broadcast(f"Notification Echo: {data}")
+    except WebSocketDisconnect:
+        ws_manager.disconnect(websocket)
+
 
 

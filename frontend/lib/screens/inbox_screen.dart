@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/app_state.dart';
 import '../theme.dart';
+import '../widgets/rules_modal.dart';
+import '../services/api_service.dart';
+import '../widgets/compose_modal.dart';
+
 
 class InboxScreen extends StatefulWidget {
   const InboxScreen({super.key});
@@ -92,26 +96,48 @@ class _InboxScreenState extends State<InboxScreen> {
             ),
             child: Column(
               children: [
-                // Search bar
+                // Search bar and Rules button
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: TextField(
-                    controller: _searchCtrl,
-                    onChanged: (val) => state.setSearchQuery(val),
-                    decoration: InputDecoration(
-                      hintText: 'Search emails...',
-                      prefixIcon: const Icon(Icons.search, size: 18),
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.white.withOpacity(0.08)),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _searchCtrl,
+                          onChanged: (val) => state.setSearchQuery(val),
+                          decoration: InputDecoration(
+                            hintText: 'Search emails...',
+                            prefixIcon: const Icon(Icons.search, size: 18),
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.white.withOpacity(0.08)),
+                            ),
+                            filled: true,
+                            fillColor: const Color(0xFF16161A),
+                          ),
+                        ),
                       ),
-                      filled: true,
-                      fillColor: const Color(0xFF16161A),
-                    ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        tooltip: 'Automation Rules',
+                        style: IconButton.styleFrom(
+                          backgroundColor: MailMindTheme.accent.withOpacity(0.15),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        icon: Icon(Icons.tune, color: MailMindTheme.accent, size: 20),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => const RulesModal(),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
+
                 Expanded(
                   child: state.isLoadingEmails
                       ? Center(child: CircularProgressIndicator(color: MailMindTheme.accent))
@@ -273,6 +299,46 @@ class _EmailDetailPane extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 16),
+                // 1-Click Smart Auto-Reply Action Chips
+                Row(
+                  children: [
+                    const Icon(Icons.auto_awesome, size: 16, color: Colors.amber),
+                    const SizedBox(width: 6),
+                    Text('Smart Auto-Reply:', style: TextStyle(fontSize: 11, color: MailMindTheme.textMuted, fontWeight: FontWeight.bold)),
+                    const SizedBox(width: 10),
+                    Wrap(
+                      spacing: 8,
+                      children: ['Accept', 'Decline', 'Inquire'].map((intent) {
+                        return ActionChip(
+                          avatar: Icon(
+                            intent == 'Accept' ? Icons.check_circle_outline : intent == 'Decline' ? Icons.cancel_outlined : Icons.help_outline,
+                            size: 14,
+                            color: intent == 'Accept' ? const Color(0xFF2CB67D) : intent == 'Decline' ? Colors.red : Colors.blue,
+                          ),
+                          label: Text(intent, style: const TextStyle(fontSize: 11)),
+                          backgroundColor: MailMindTheme.cardBg,
+                          side: BorderSide(color: MailMindTheme.textMain.withOpacity(0.12)),
+                          onPressed: () async {
+                            final api = ApiService();
+                            final replyText = await api.generateAIReply(email['subject'], email['body'], intent);
+                            if (context.mounted) {
+                              showDialog(
+                                context: context,
+                                builder: (context) => ComposeModal(
+                                  initialRecipient: email['sender'],
+                                  initialSubject: 'Re: ${email['subject']}',
+                                  initialBody: replyText,
+                                ),
+                              );
+                            }
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+
               ],
             ),
           ),

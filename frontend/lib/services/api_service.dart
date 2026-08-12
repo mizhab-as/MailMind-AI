@@ -139,6 +139,20 @@ class ApiService {
       throw Exception('Failed to generate reply');
     }
   }
+
+  Future<Map<String, dynamic>> generateInterviewPrep(String company, String role) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/ai/interview-prep'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'company': company, 'role': role}),
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to generate interview prep');
+    }
+  }
 }
+
 
 

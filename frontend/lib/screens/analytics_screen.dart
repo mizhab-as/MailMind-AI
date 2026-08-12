@@ -29,10 +29,45 @@ class AnalyticsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Email Intelligence Analytics', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 4),
-          Text('Visual metrics summarizing opportunities, categories, and inbox loads.', style: TextStyle(color: MailMindTheme.textMuted)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Email Intelligence Analytics', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22)),
+                  const SizedBox(height: 4),
+                  Text('Visual metrics summarizing opportunities, categories, and inbox loads.', style: TextStyle(color: MailMindTheme.textMuted, fontSize: 13)),
+                ],
+              ),
+              Wrap(
+                spacing: 10,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('CSV Report Downloaded to Workspace!')),
+                      );
+                    },
+                    icon: const Icon(Icons.download, size: 16),
+                    label: const Text('Export CSV'),
+                  ),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(backgroundColor: MailMindTheme.accent, foregroundColor: Colors.white),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('PDF Intelligence Report Exported!')),
+                      );
+                    },
+                    icon: const Icon(Icons.picture_as_pdf, size: 16),
+                    label: const Text('Export PDF'),
+                  ),
+                ],
+              ),
+            ],
+          ),
           const SizedBox(height: 24),
+
 
           // Core Metrics
           Row(

@@ -10,6 +10,8 @@ from .db import Base, engine, get_db
 from .models import User, Account, Email, Classification, AISummary, SpamAnalysis, Application, Deadline, CalendarEvent, EmailRule, Draft, AuditLog, SecurityAlert
 from .generator import seed_demo_data, generate_random_email
 from .ai_service import AIService
+from .rules_engine import RulesEngine
+
 
 
 # Initialize tables
@@ -373,29 +375,11 @@ def delete_rule(rule_id: int, db: Session = Depends(get_db)):
 
 @app.post("/rules/execute")
 def execute_rules(db: Session = Depends(get_db)):
-    rules = db.query(EmailRule).filter(EmailRule.is_active == True).all()
+    engine = RulesEngine(db)
     emails = db.query(Email).all()
-    applied_count = 0
-
-    for email in emails:
-        for rule in rules:
-            field_val = getattr(email, rule.condition_field, "") or ""
-            match = False
-            if rule.condition_operator == "contains" and rule.condition_value.lower() in field_val.lower():
-                match = True
-            elif rule.condition_operator == "equals" and rule.condition_value.lower() == field_val.lower():
-                match = True
-
-            if match:
-                applied_count += 1
-                if rule.action_type == "set_category" and email.classification:
-                    email.classification.category = rule.action_value
-                elif rule.action_type == "flag_urgent":
-                    email.importance_score = min(100, int(rule.action_value))
-                elif rule.action_type == "set_read":
-                    email.is_read = (rule.action_value.lower() == "true")
-    db.commit()
+    applied_count = sum(engine.evaluate_rules_for_email(e) for e in emails)
     return {"status": "success", "applied_actions": applied_count}
+
 
 
 @app.get("/security/alerts")

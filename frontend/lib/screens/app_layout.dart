@@ -9,6 +9,8 @@ import 'calendar_screen.dart';
 import 'assistant_screen.dart';
 import 'analytics_screen.dart';
 import 'security_screen.dart';
+import '../widgets/compose_modal.dart';
+
 
 class AppLayout extends StatefulWidget {
   const AppLayout({super.key});
@@ -74,8 +76,35 @@ class _AppLayoutState extends State<AppLayout> {
                       ]
                     ],
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
+                  // Compose Button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: MailMindTheme.accent,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => const ComposeModal(),
+                          );
+                        },
+                        icon: const Icon(Icons.edit_outlined, size: 18),
+                        label: _isSidebarCollapsed
+                            ? const SizedBox()
+                            : const Text('Compose', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   // Navigation Actions List
+
                   Expanded(
                     child: ListView.builder(
                       itemCount: _navItems.length,
